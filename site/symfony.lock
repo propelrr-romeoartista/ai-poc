@@ -341,6 +341,9 @@
             "./config/routes/webhook.yaml"
         ]
     },
+    "symfonycasts/tailwind-bundle": {
+        "version": "v0.7.1"
+    },
     "twig/extra-bundle": {
         "version": "v3.20.0"
     }
