@@ -1,0 +1,65 @@
+version: "3.8"
+services:
+  poc-app:
+    build: docker/php
+    container_name: poc-app
+    working_dir: /var/www/site
+    volumes:
+      - ./site:/var/www/site
+      - ./docker/php/conf.d/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - poc-vendor-data:/var/www/site/vendor
+      - poc-var-data:/var/www/site/var
+    networks:
+      - poc-network
+
+  poc-nginx:
+    image: nginx:mainline-alpine
+    container_name: poc-nginx
+    working_dir: /var/www/site
+    ports:
+      - "8088:80"
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./site:/var/www/site:ro
+      - poc-vendor-data:/var/www/site/vendor:ro
+      - poc-var-data:/var/www/site/var:ro
+    networks:
+      - poc-network
+
+  poc-phpmyadmin:
+    ports:
+      - "8089:80"
+    container_name: poc-phpmyadmin
+    depends_on:
+      - poc-mysql
+    image: phpmyadmin:latest
+    environment:
+      PMA_HOST: poc-mysql:3306
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    networks:
+      - poc-network
+
+  poc-mysql:
+    image: mysql:latest
+    container_name: poc-mysql
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-db}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+      - MYSQL_USER=${MYSQL_USER:-user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-pass}
+    volumes:
+      - poc-db-data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - "3310:3306"
+    networks:
+      - poc-network
+
+networks:
+  poc-network:
+    driver: bridge
+
+volumes:
+  poc-vendor-data:
+  poc-var-data:
+  poc-db-data:
