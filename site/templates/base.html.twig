@@ -13,6 +13,32 @@
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        {% if error is defined and error is not empty %}
+            <div class="alert alert-danger mt-3">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+        {% if app.user %}
+            <div class="pt-3 mt-3 mb-3 text-right">
+                <a class="rounded-md px-3 py-3 text-white bg-red-700 hover:bg-red-500 mt-3 mr-3" href="{{ path('app_logout') }}">Logout</a>
+            </div>
+            <aside
+                class="fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform -translate-x-full border-r md:translate-x-0"
+                aria-label="Sidenav"
+                id="drawer-navigation">
+                <div class="overflow-y-auto py-5 px-3 h-full">
+                    <ul class="space-y-2">
+                        <li>
+                            <a
+                                href="{{ path('app_players') }}"
+                                class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg text-white hover:bg-gray-600">
+                                    <span class="ml-3">Players</span>
+                            </a>
+                    </ul>
+                </div>
+            </aside>
+        {% endif %}
+        <main class="p-4 md:ml-64 h-auto flex-grow">
+            {% block body %}{% endblock %}
+        </main>
     </body>
 </html>
